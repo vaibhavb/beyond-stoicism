@@ -24,33 +24,20 @@ class BeyondStoicismApp {
     }
 
     computeBasePath() {
-        try {
-            // Prefer deriving from CSS link
-            const css = document.querySelector('link[href*="css/main.css"]');
-            if (css) {
-                const u = new URL(css.href, window.location.origin);
-                const p = u.pathname; // e.g., /beyond-stoicism/css/main.css
-                const base = p.replace(/\/css\/main\.css$/, '/');
-                if (base) return base;
-            }
-            // Fallback to script src
-            const scripts = Array.from(document.scripts);
-            const app = scripts.find(s => (s.getAttribute('src') || '').includes('js/app.js'));
-            if (app) {
-                const u = new URL(app.src, window.location.origin);
-                const p = u.pathname; // e.g., /beyond-stoicism/js/app.js
-                const base = p.replace(/\/js\/app\.js$/, '/');
-                if (base) return base;
-            }
-        } catch (_) {}
-        // Last resort: derive from current path
+        // Derive base from current page path; robust for GitHub Pages subpaths
         const p = window.location.pathname;
-        // If path ends with a file (has a dot), strip to directory
+        // If path ends with a filename (contains a dot), strip it
         if (/\.[a-zA-Z0-9]+$/.test(p)) {
             const idx = p.lastIndexOf('/');
             return (idx >= 0 ? p.substring(0, idx + 1) : '/');
         }
-        return p.endsWith('/') ? p : p + '/';
+        // If path ends with a slug (no trailing slash), strip last segment
+        if (!p.endsWith('/')) {
+            const idx = p.lastIndexOf('/');
+            return (idx >= 0 ? p.substring(0, idx + 1) : '/');
+        }
+        // Already a directory path
+        return p;
     }
 
     async loadChaptersMetaAndBuildNav() {
