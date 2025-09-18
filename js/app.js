@@ -5,6 +5,8 @@ class BeyondStoicismApp {
         this.contentLoader = new ContentLoader();
         this.chapterNamesOverride = null; // from frontmatter if provided
         this.pendingAnchor = null; // anchor to scroll to after load
+        this.chapterSlugsOverride = null; // optional number->slug map from frontmatter
+        this.basePath = '/';
         this.init();
     }
 
@@ -12,12 +14,43 @@ class BeyondStoicismApp {
     init() {
         this.setupEventListeners();
         this.initializeNavigation();
+        this.basePath = this.computeBasePath();
         // Load chapter metadata from content/index.md and build nav dynamically
         this.loadChaptersMetaAndBuildNav();
         this.loadProgress();
         this.updateProgressDisplay();
         // Enable path-based routing (History API) for bookmarking
         window.addEventListener('popstate', () => this.routeFromLocation());
+    }
+
+    computeBasePath() {
+        try {
+            // Prefer deriving from CSS link
+            const css = document.querySelector('link[href*="css/main.css"]');
+            if (css) {
+                const u = new URL(css.href, window.location.origin);
+                const p = u.pathname; // e.g., /beyond-stoicism/css/main.css
+                const base = p.replace(/\/css\/main\.css$/, '/');
+                if (base) return base;
+            }
+            // Fallback to script src
+            const scripts = Array.from(document.scripts);
+            const app = scripts.find(s => (s.getAttribute('src') || '').includes('js/app.js'));
+            if (app) {
+                const u = new URL(app.src, window.location.origin);
+                const p = u.pathname; // e.g., /beyond-stoicism/js/app.js
+                const base = p.replace(/\/js\/app\.js$/, '/');
+                if (base) return base;
+            }
+        } catch (_) {}
+        // Last resort: derive from current path
+        const p = window.location.pathname;
+        // If path ends with a file (has a dot), strip to directory
+        if (/\.[a-zA-Z0-9]+$/.test(p)) {
+            const idx = p.lastIndexOf('/');
+            return (idx >= 0 ? p.substring(0, idx + 1) : '/');
+        }
+        return p.endsWith('/') ? p : p + '/';
     }
 
     async loadChaptersMetaAndBuildNav() {
@@ -158,7 +191,7 @@ class BeyondStoicismApp {
             const num = contentId.split('-')[1];
             slug = this.slugify(this.getChapterNames()[num] || contentId);
         }
-        let newPath = base + (slug ? (base.endsWith('/') ? '' : '/') + slug : '');
+        let newPath = base + (slug ? slug : '');
         if (!newPath) newPath = '/';
         const url = newPath + (anchor ? '#' + anchor : '');
         if (replace) history.replaceState(null, '', url); else history.pushState(null, '', url);
@@ -166,11 +199,7 @@ class BeyondStoicismApp {
     }
 
     getBasePath() {
-        const p = window.location.pathname;
-        const idx = p.lastIndexOf('/');
-        if (idx === -1) return '/';
-        const base = p.substring(0, idx + 1);
-        return base || '/';
+        return this.basePath || '/';
     }
 
     buildChaptersNav() {
