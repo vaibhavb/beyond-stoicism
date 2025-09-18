@@ -22,7 +22,7 @@ class BeyondStoicismApp {
 
     async loadChaptersMetaAndBuildNav() {
         try {
-            const res = await fetch(`/content/index.md?t=${Date.now()}`);
+            const res = await fetch(`${this.getBasePath()}content/index.md?t=${Date.now()}`);
             if (!res.ok) throw new Error('Failed to fetch index.md');
             const raw = await res.text();
             const { frontmatter } = this.extractFrontmatter(raw);
@@ -166,12 +166,11 @@ class BeyondStoicismApp {
     }
 
     getBasePath() {
-        const parts = window.location.pathname.split('/');
-        // Remove last segment (could be current slug)
-        parts.pop();
-        let base = parts.join('/');
-        if (!base) base = '/';
-        return base.endsWith('/') ? base : base + '/';
+        const p = window.location.pathname;
+        const idx = p.lastIndexOf('/');
+        if (idx === -1) return '/';
+        const base = p.substring(0, idx + 1);
+        return base || '/';
     }
 
     buildChaptersNav() {
@@ -487,7 +486,7 @@ class BeyondStoicismApp {
         const contentBody = document.getElementById('contentBody');
         contentBody.innerHTML = '<div class="loading">Loading...</div>';
         try {
-            const res = await fetch(`/content/index.md?t=${Date.now()}`);
+            const res = await fetch(`${this.getBasePath()}content/index.md?t=${Date.now()}`);
             if (!res.ok) throw new Error('Failed to load index.md');
             const raw = await res.text();
             const { frontmatter, body } = this.extractFrontmatter(raw);
@@ -512,7 +511,7 @@ class BeyondStoicismApp {
         contentBody.innerHTML = '<div class="loading">Loading timeline content...</div>';
         
         try {
-            const htmlContent = await this.contentLoader.loadContent('/content/timeline.md');
+            const htmlContent = await this.contentLoader.loadContent(`${this.getBasePath()}content/timeline.md`);
             contentBody.innerHTML = `
                 <div class="chapter-content">
                     ${htmlContent}
@@ -557,7 +556,7 @@ class BeyondStoicismApp {
         
         try {
             const fileSlug = this.getChapterSlugByNumber(chapterNumber, chapterNames[chapterNumber]);
-            const chapterFile = `/content/chapters/${chapterNumber.padStart(2, '0')}-${fileSlug}.md`;
+            const chapterFile = `${this.getBasePath()}content/chapters/${chapterNumber.padStart(2, '0')}-${fileSlug}.md`;
             const htmlContent = await this.contentLoader.loadContent(chapterFile);
             
             contentBody.innerHTML = `
@@ -1065,7 +1064,7 @@ class BeyondStoicismApp {
         contentBody.innerHTML = '<div class="loading">Loading epilogue content...</div>';
         
         try {
-            const htmlContent = await this.contentLoader.loadContent('/content/epilogue.md');
+            const htmlContent = await this.contentLoader.loadContent(`${this.getBasePath()}content/epilogue.md`);
             contentBody.innerHTML = `
                 <div class="chapter-content">
                     ${htmlContent}
@@ -1103,7 +1102,7 @@ class BeyondStoicismApp {
         contentBody.innerHTML = '<div class="loading">Loading bibliography content...</div>';
         
         try {
-            const htmlContent = await this.contentLoader.loadContent('/content/bibliography.md');
+            const htmlContent = await this.contentLoader.loadContent(`${this.getBasePath()}content/bibliography.md`);
             contentBody.innerHTML = `
                 <div class="chapter-content">
                     ${htmlContent}
