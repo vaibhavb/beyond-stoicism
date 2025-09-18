@@ -1,0 +1,148 @@
+/* Print Styles */
+@media print {
+    * {
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+
+    body {
+        font-family: 'Times New Roman', serif;
+        font-size: 12pt;
+        line-height: 1.5;
+        color: #000;
+        background: white;
+    }
+
+    /* Hide non-printable elements */
+    .sidebar,
+    .content-header,
+    .content-actions,
+    .btn,
+    .toggle-btn,
+    .progress-summary {
+        display: none !important;
+    }
+
+    /* Adjust main content for print */
+    .container {
+        display: block;
+        height: auto;
+    }
+
+    .main-content {
+        width: 100%;
+        max-width: none;
+        overflow: visible;
+    }
+
+    .content-body {
+        padding: 0;
+        overflow: visible;
+    }
+
+    /* Chapter content formatting */
+    .chapter-content {
+        max-width: none;
+        margin: 0;
+    }
+
+    .chapter-content h1 {
+        font-size: 18pt;
+        margin-top: 0;
+        margin-bottom: 20pt;
+        border-bottom: 2pt solid #000;
+        padding-bottom: 6pt;
+    }
+
+    .chapter-content h2 {
+        font-size: 16pt;
+        margin-top: 20pt;
+        margin-bottom: 12pt;
+    }
+
+    .chapter-content h3 {
+        font-size: 14pt;
+        margin-top: 16pt;
+        margin-bottom: 8pt;
+    }
+
+    .chapter-content p {
+        margin-bottom: 12pt;
+        text-align: justify;
+    }
+
+    .chapter-content blockquote {
+        border-left: 3pt solid #000;
+        padding: 12pt 16pt;
+        margin: 16pt 0;
+        background: #f5f5f5;
+        font-style: italic;
+    }
+
+    /* Exercise sections */
+    .exercise-section {
+        border: 1pt solid #000;
+        padding: 16pt;
+        margin: 20pt 0;
+        background: #f9f9f9;
+        break-inside: avoid;
+    }
+
+    .exercise-section h3 {
+        margin-top: 0;
+        margin-bottom: 12pt;
+        font-weight: bold;
+    }
+
+    /* Reflection areas - show as lined areas for writing */
+    .reflection-area {
+        border: 1pt solid #ccc;
+        background: white;
+        min-height: 100pt;
+        background-image: repeating-linear-gradient(
+            white 0,
+            white 18pt,
+            #e0e0e0 18pt,
+            #e0e0e0 19pt
+        );
+        padding: 8pt;
+    }
+
+    /* Page breaks */
+    .chapter-content h1 {
+        page-break-before: always;
+    }
+
+    .chapter-content h1:first-child {
+        page-break-before: auto;
+    }
+
+    .exercise-section {
+        page-break-inside: avoid;
+    }
+
+    /* Ensure good text flow */
+    p, li {
+        orphans: 3;
+        widows: 3;
+    }
+
+    h1, h2, h3 {
+        page-break-after: avoid;
+    }
+
+    /* Print header/footer */
+    @page {
+        margin: 1in;
+        @top-center {
+            content: "Beyond Stoicism - Digital Workbook";
+            font-size: 10pt;
+            font-family: Arial, sans-serif;
+        }
+        @bottom-center {
+            content: counter(page);
+            font-size: 10pt;
+            font-family: Arial, sans-serif;
+        }
+    }
+}

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beyond Stoicism</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/print.css" media="print">
+</head>
+<body>
+    <div id="app-root">
+        <!-- Load the SPA shell for GitHub Pages deep links -->
+        <script>
+            // Serve index.html shell by injecting it into this page
+            // We simply fetch index.html and write its body here
+            (async function() {
+              try {
+                const res = await fetch('index.html');
+                const html = await res.text();
+                document.open();
+                document.write(html);
+                document.close();
+              } catch (e) {
+                document.body.innerHTML = '<p style="padding:1rem">Loading failed. Please go to <a href="/">Home</a>.</p>';
+              }
+            })();
+        </script>
+    </div>
+</body>
+</html>
