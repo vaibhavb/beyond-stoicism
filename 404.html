@@ -15,13 +15,17 @@
             // We simply fetch index.html and write its body here
             (async function() {
               try {
-                const res = await fetch('index.html');
-                const html = await res.text();
+                const path = window.location.pathname;
+                const base = path.replace(/[^\/]*$/, ''); // keep trailing slash
+                const res = await fetch(base + 'index.html');
+                let html = await res.text();
+                // Rewrite relative asset URLs to absolute base
+                html = html.replace(/(href|src)="(css|js|content)\//g, `$1="${base}$2/`);
                 document.open();
                 document.write(html);
                 document.close();
               } catch (e) {
-                document.body.innerHTML = '<p style="padding:1rem">Loading failed. Please go to <a href="/">Home</a>.</p>';
+                document.body.innerHTML = '<p style="padding:1rem">Loading failed. Please go to <a href="../">Home</a>.</p>';
               }
             })();
         </script>
